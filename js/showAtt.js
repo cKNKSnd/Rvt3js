@@ -10,6 +10,8 @@ lastMeshID = -1;
 lastObjectMaterial = -1;
 lastObjectID = -1;
 
+var lastEvent;
+
 function computeNormalsAndFaces() {
   for (var i = 0; i < scene.children.length; i++) {
     if (scene.children[i].hasOwnProperty("geometry")) {
@@ -47,6 +49,11 @@ function clickHandler(event) {
   if (event.which == 2) {
     console.log('middle press');
   }
+
+  console.log("click handler");
+  console.log(`x: ${event.clientX} y: ${event.clientY}`);
+
+  lastEvent = event;
 
   selMaterial = new THREE.MeshBasicMaterial({
     color: 'red',
@@ -159,4 +166,79 @@ function clickHandler(event) {
     msg.innerHTML = '';
   }
   if(animLoop == false) {render();}
+}
+
+
+function changeColorHanlder(event) {
+  // console.log( event );
+  event.preventDefault();
+  event.stopPropagation();  // 阻止事件冒泡，防止在被 clickHandler 处理
+  if (event.which == 2) {
+    console.log('middle press');
+  }
+
+  console.log("change color handler");
+  console.log(`event x: ${event.clientX} y: ${event.clientY}`);
+  console.log(`lastClickEvent x: ${lastEvent.clientX} y: ${lastEvent.clientY}`);
+
+  var chgMaterial = new THREE.MeshBasicMaterial({
+    color: Math.random() * 0xffffff,
+    side: '2'
+  }); //color for selected mesh element
+
+  var vector = new THREE.Vector3((lastEvent.clientX / window.innerWidth) * 2 - 1, -
+    (lastEvent.clientY / window.innerHeight) * 2 + 1, 0.5);
+  //projector.unprojectVector( vector, camera );
+  vector.unproject(camera);
+
+  var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position)
+    .normalize());
+  //var raycaster = new THREE.Raycaster( camera.position, vector.sub( ).normalize() );
+
+  var intersects = raycaster.intersectObjects(targetList);
+  //var intersects = raycaster.intersectObjects( scene.children.geometry );
+
+  if (intersects.length > 0) {
+
+    // intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+    // console.log(intersects[0].object.userData);
+    // console.log(intersects);
+    var j = 0;
+    while (j < intersects.length) {
+      //FOR MESHES:
+      if (!$.isEmptyObject(intersects[j].object.userData)) {
+        console.log(intersects[j].object.userData);
+
+        //set lastMeshID
+        // lastMeshID = intersects[j].object.id;
+
+        //apply SelMaterial
+        intersects[j].object.material = chgMaterial;
+
+        //set lastMaterial
+        lastMeshMaterial = intersects[j].object.material;
+
+        break;
+      }
+      // FOR OBJECT3D
+      if (!$.isEmptyObject(intersects[j].object.parent.userData)) {
+        console.log(intersects[j].object.parent.userData);
+
+        //set lastObjectID
+        // lastObjectID = intersects[j].object.parent.id;
+
+
+        //apply SelMaterial
+        intersects[j].object.material = chgMaterial;
+
+        //set lastMaterial
+        lastObjectMaterial = intersects[j].object.material;
+
+        break;
+      }
+      j++;
+    } // end of while loop
+
+  }
+  if (animLoop == false) { render(); }
 }

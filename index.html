@@ -87,6 +87,9 @@
 				</div>
 			</div>
 			<div class="menuR">
+				<div class="button change-color">
+					Change Color
+				</div>
 				<div class="button mouse-ctrl">
 					Mouse Controls
 				</div>
@@ -155,12 +158,14 @@
 			var stats;
 			var projector;
 
+			var changeColorBtn = document.querySelector('.change-color');
 			var clkBtn = document.querySelector( '.description-event' );
 			var mouseBtn = document.querySelector( '.mouse-ctrl' );
 			var grabBtn = document.querySelector( '.leap-ctrl' );
 			var pntBtn = document.querySelector( '.leapP-ctrl' );
 			var vrBtn = document.querySelector( '.vr' );
 
+			changeColorBtn.onclick = changeColorHanlder;
 			mouseBtn.onclick = function(){mouse();};
 			grabBtn.onclick = function(){twoHand();};
 			pntBtn.onclick = function(){pointer();};
